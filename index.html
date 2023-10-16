@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Shaka Player with Axinom DRM</title>
+	</head>
+	<body>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+        <script src="https://cdn.jsdelivr.net/npm/shaka-player@4.3.5/dist/shaka-player.compiled.min.js"></script>
+        <link
+			rel="stylesheet"
+			href="https://cdn.jsdelivr.net/npm/shaka-player@4.3.5/dist/controls.min.css"
+		/>
+
+		<video id="videoPlayer" controls></video>
+
+		<script>
+			videoElement = document.getElementById('videoPlayer')
+			player = new shaka.Player(videoElement)
+			shaka.polyfill.installAll()
+
+			protection = {
+				drm: {
+					servers: {
+						'com.widevine.alpha': "https://drm-fairplay-licensing.axtest.net/AcquireLicense" ,
+					},
+				},
+			}
+			player.configure(protection)
+
+			player.getNetworkingEngine().registerRequestFilter(function (type, request) {
+				if (type === shaka.net.NetworkingEngine.RequestType.LICENSE) {
+					request.headers['X-AxDRM-Message'] =
+						'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2ZXJzaW9uIjoxLCJjb21fa2V5X2lkIjoiNkUyQjczMjktODJGMi00QUQwLUFGMTQtQThGRTAwNzcxNjExIiwibWVzc2FnZSI6eyJ0eXBlIjoiZW50aXRsZW1lbnRfbWVzc2FnZSIsInZlcnNpb24iOjIsImNvbnRlbnRfa2V5c19zb3VyY2UiOnsiaW5saW5lIjpbeyJpZCI6IjRkN2MyNWRiLWQzODAtNGQyMy1iNWNmLTQ4YmQwOWMzZWJiOCJ9XX19fQ.kXUY0qVR97_WoqzNl99DXRhM67Pz8K_c_QZELTewRPQ'
+				}
+			})
+			player.load(
+				'https://d2nf2lzo74kc7g.cloudfront.net/20230723T180141/input_video_with_audio/drm/dash/input_video_with_audio.m3u8',
+			)
+
+			$('#shaka-player').show()
+		</script>
+	</body>
+</html
